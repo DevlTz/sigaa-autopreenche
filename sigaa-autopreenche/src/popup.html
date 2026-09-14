@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SIGAA AutoPreenche</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #101014;
+      --surface: #17171d;
+      --surface-2: #1d1b28;
+      --surface-3: #14151b;
+      --border: #34313f;
+      --border-soft: #292732;
+      --purple: #8b7cf6;
+      --purple-strong: #705ee8;
+      --blue: #70a9ff;
+      --green: #78d69b;
+      --green-bg: #14241a;
+      --green-border: #2f6743;
+      --warn: #d8ac57;
+      --warn-bg: #2a2418;
+      --warn-border: #66512a;
+      --danger: #ee7d86;
+      --text: #efedf4;
+      --muted: #9c98aa;
+      --muted-2: #777383;
+    }
+
+    body {
+      width: 340px;
+      min-height: 240px;
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      font-size: 13px;
+    }
+
+    header {
+      padding: 15px 16px 13px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1px solid var(--border-soft);
+      background: #121217;
+    }
+
+    .logo {
+      width: 31px;
+      height: 31px;
+      display: grid;
+      place-items: center;
+      border: 1px solid #988cff;
+      border-radius: 4px;
+      background: #28223f;
+      color: #c8c1ff;
+      font-weight: 800;
+      font-size: 14px;
+    }
+
+    h1 {
+      font-size: 15px;
+      line-height: 1.15;
+      font-weight: 750;
+      letter-spacing: -0.2px;
+    }
+
+    h1 span { color: #a99fff; }
+
+    .subtitle {
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 10.5px;
+    }
+
+    main {
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 11px;
+    }
+
+    .status-card,
+    .reuse-section,
+    .result-card {
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      background: var(--surface);
+    }
+
+    .status-card {
+      padding: 11px 12px;
+      display: flex;
+      gap: 9px;
+      border-left-width: 3px;
+    }
+
+    .status-card.ok { border-left-color: var(--green); }
+    .status-card.info { border-left-color: var(--purple); }
+    .status-card.empty { border-left-color: var(--warn); }
+
+    .status-mark {
+      width: 7px;
+      height: 7px;
+      margin-top: 5px;
+      border-radius: 50%;
+      background: var(--muted-2);
+      flex: 0 0 auto;
+    }
+    .status-card.ok .status-mark { background: var(--green); }
+    .status-card.info .status-mark { background: var(--purple); }
+    .status-card.empty .status-mark { background: var(--warn); }
+
+    .status-label { font-weight: 650; font-size: 12px; }
+    .status-detail { color: var(--muted); font-size: 11px; margin-top: 3px; line-height: 1.35; }
+
+    .actions { display: grid; gap: 7px; }
+
+    button {
+      appearance: none;
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 10px 12px;
+      background: #1b1a22;
+      color: var(--text);
+      font: inherit;
+      font-weight: 600;
+      text-align: left;
+      cursor: pointer;
+      transition: background 120ms ease, border-color 120ms ease, color 120ms ease;
+    }
+
+    button:hover:not(:disabled) { background: #22202a; border-color: #4c475a; }
+    button:disabled { opacity: .42; cursor: not-allowed; }
+
+    .btn-primary {
+      border-color: #5f50cb;
+      background: #2b2545;
+      color: #d8d3ff;
+    }
+    .btn-primary:hover:not(:disabled) { background: #352d55; border-color: var(--purple); }
+
+    .btn-save {
+      border-color: #365543;
+      background: #18241d;
+      color: #a9e7bd;
+    }
+    .btn-save:hover:not(:disabled) { background: #1e2e25; border-color: #4f7a5f; }
+
+    .reuse-section { padding: 12px; background: var(--surface-2); border-color: #403a55; }
+
+    .section-kicker {
+      color: #b9b0ff;
+      text-transform: uppercase;
+      letter-spacing: .45px;
+      font-size: 10.5px;
+      font-weight: 750;
+    }
+
+    .model-row {
+      margin-top: 8px;
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .model-period { font-size: 13px; font-weight: 700; }
+    .model-period strong { color: #b8afff; }
+    .model-meta { color: var(--muted); font-size: 10.5px; text-align: right; }
+    .model-description { color: var(--muted); font-size: 11px; line-height: 1.4; margin-top: 5px; }
+
+    .reuse-actions { display: grid; gap: 7px; margin-top: 10px; }
+
+    .btn-capture { border-color: #4d4669; color: #c8c1ff; background: #211e30; }
+    .btn-apply { border-color: #5146c4; color: #e0dcff; background: #302851; }
+    .btn-apply:hover:not(:disabled) { border-color: #8477f3; background: #3a3062; }
+
+    .button-hint { color: var(--muted-2); font-size: 10.5px; line-height: 1.35; margin-top: -2px; }
+
+    .result-card { padding: 11px 12px; display: none; }
+    .result-card.success { display: block; background: var(--green-bg); border-color: var(--green-border); }
+    .result-card.warning { display: block; background: var(--warn-bg); border-color: var(--warn-border); }
+    .result-title { font-weight: 700; font-size: 12px; }
+    .result-card.success .result-title { color: #9be6b3; }
+    .result-card.warning .result-title { color: #efc66f; }
+    .result-detail { margin-top: 3px; color: var(--muted); font-size: 10.5px; }
+
+    .details-toggle {
+      width: auto;
+      margin-top: 8px;
+      padding: 5px 8px;
+      background: transparent;
+      border-color: #5f5435;
+      color: #e4c77e;
+      font-size: 10.5px;
+      font-weight: 650;
+    }
+
+    .failure-list {
+      display: none;
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid rgba(255,255,255,.08);
+      max-height: 150px;
+      overflow: auto;
+    }
+    .failure-list.open { display: block; }
+    .failure-item { padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,.06); }
+    .failure-item:last-child { border-bottom: 0; }
+    .failure-question { color: var(--text); font-size: 10.5px; line-height: 1.3; }
+    .failure-answer { color: #d9bd76; font-size: 10px; margin-top: 2px; }
+    .failure-reason { color: var(--muted); font-size: 10px; margin-top: 2px; }
+
+    details.utility {
+      border-top: 1px solid var(--border-soft);
+      padding-top: 3px;
+    }
+
+    details.utility summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 8px 1px 6px;
+      color: #c4c0cd;
+      font-size: 11.5px;
+      font-weight: 650;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    details.utility summary::-webkit-details-marker { display: none; }
+    .chevron { color: var(--muted-2); transition: transform 120ms ease; }
+    details[open] .chevron { transform: rotate(90deg); }
+
+    .utility-content { padding: 5px 0 2px; }
+    .io-row { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+    .btn-secondary { font-size: 11px; padding: 8px 9px; color: #b9b5c3; background: var(--surface-3); }
+    .privacy-note { margin-top: 7px; color: var(--muted-2); font-size: 10px; line-height: 1.35; }
+
+    .profiles { display: grid; gap: 5px; max-height: 150px; overflow: auto; }
+    .profile-item {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      padding: 7px 8px;
+      border: 1px solid var(--border-soft);
+      background: var(--surface-3);
+      border-radius: 3px;
+    }
+    .profile-info { min-width: 0; flex: 1; }
+    .profile-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 10.5px; }
+    .profile-date { color: var(--muted-2); font-size: 9.5px; margin-top: 2px; }
+    .btn-mini { width: auto; padding: 3px 7px; font-size: 10px; color: var(--muted); background: transparent; }
+    .btn-mini:hover:not(:disabled) { color: var(--danger); border-color: #75424a; }
+    .empty-state { color: var(--muted-2); font-size: 10.5px; padding: 5px 0; }
+
+    .privacy-strip {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 2px 1px 0;
+      color: var(--muted-2);
+      font-size: 10px;
+    }
+    .privacy-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
+
+    .toast {
+      position: fixed;
+      left: 12px;
+      right: 12px;
+      bottom: 12px;
+      padding: 9px 11px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      background: #19191f;
+      color: var(--text);
+      font-size: 11px;
+      line-height: 1.35;
+      opacity: 0;
+      transform: translateY(12px);
+      pointer-events: none;
+      transition: opacity 140ms ease, transform 140ms ease;
+      z-index: 10;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .toast.success { border-color: var(--green-border); color: #a3e8b9; }
+    .toast.error { border-color: #6f3940; color: #f0a0a6; }
+    .toast.info { border-color: #514a69; color: #cbc4ff; }
+
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #393643; border-radius: 2px; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">S</div>
+    <div>
+      <h1>SIGAA <span>AutoPreenche</span></h1>
+      <div class="subtitle">Cadastro Único sem preencher tudo de novo</div>
+    </div>
+  </header>
+
+  <main>
+    <section class="status-card info" id="statusCard">
+      <span class="status-mark"></span>
+      <div>
+        <div class="status-label" id="statusLabel">Verificando página...</div>
+        <div class="status-detail" id="statusDetail"></div>
+      </div>
+    </section>
+
+    <div class="actions">
+      <button class="btn-primary" id="btnPreencher" style="display:none">Restaurar dados salvos</button>
+      <button class="btn-save" id="btnSalvar">Salvar estado desta página</button>
+    </div>
+
+    <section class="reuse-section" id="cadastroSection" style="display:none">
+      <div class="section-kicker">Reutilizar cadastro anterior</div>
+      <div class="model-row" id="modelRow" style="display:none">
+        <div class="model-period">Modelo: <strong id="modelPeriod">—</strong></div>
+        <div class="model-meta" id="modelMeta"></div>
+      </div>
+      <div class="model-description" id="cadastroDetail"></div>
+
+      <div class="reuse-actions">
+        <button class="btn-capture" id="btnCapturarCadastro" style="display:none">Capturar cadastro anterior</button>
+        <button class="btn-apply" id="btnAplicarCadastro" style="display:none">Aplicar no cadastro atual</button>
+        <div class="button-hint" id="applyHint" style="display:none"></div>
+      </div>
+    </section>
+
+    <section class="result-card" id="resultCard">
+      <div class="result-title" id="resultTitle"></div>
+      <div class="result-detail" id="resultDetail"></div>
+      <button class="details-toggle" id="btnDetalhes" style="display:none">Ver detalhes</button>
+      <div class="failure-list" id="failureList"></div>
+    </section>
+
+    <details class="utility" id="backupDetails">
+      <summary>Backup e dados <span class="chevron">›</span></summary>
+      <div class="utility-content">
+        <div class="io-row">
+          <button class="btn-secondary" id="btnExportar">Exportar backup</button>
+          <button class="btn-secondary" id="btnImportar">Importar backup</button>
+        </div>
+        <div class="privacy-note">O arquivo JSON contém respostas do seu Cadastro Único. Guarde-o em local privado.</div>
+      </div>
+    </details>
+
+    <details class="utility" id="savedDetails">
+      <summary>Páginas salvas <span class="chevron">›</span></summary>
+      <div class="utility-content">
+        <div class="profiles" id="perfisList">
+          <div class="empty-state">Nenhuma página salva ainda.</div>
+        </div>
+      </div>
+    </details>
+
+    <div class="privacy-strip"><span class="privacy-dot"></span>Local · nenhum dado enviado</div>
+  </main>
+
+  <div class="toast" id="toast"></div>
+  <script src="popup.js"></script>
+</body>
+</html>

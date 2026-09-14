@@ -1,0 +1,21 @@
+# Backups exportados pela extensão (podem conter dados pessoais)
+sigaa-autopreenche-cadastro-*.json
+backup-*.json
+26.*.json
+
+# Pacotes e artefatos de release
+*.zip
+*.crx
+*.pem
+
+# Sistema / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Arquivos temporários
+*.log
+*.tmp
+*.swp
+*~
